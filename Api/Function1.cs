@@ -26,9 +26,40 @@ namespace Api
 
             //response.WriteString("Welcome to Azure Functions!");
 
-            var binpath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var roothpath = Path.GetFullPath(Path.Combine(binpath, ".."));
-            response.WriteString(File.ReadAllText(Path.Combine(roothpath, "sample-data/weather.json")));
+            //var binpath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            //var roothpath = Path.GetFullPath(Path.Combine(binpath, ".."));
+            //response.WriteString(File.ReadAllText(Path.Combine(roothpath, "sample-data/weather.json")));
+
+            response.WriteString("""
+                [   
+                {
+                  "date": "2022-01-06",
+                  "temperatureC": 1,
+                  "summary": "Freezing"
+                },
+                {
+                  "date": "2022-01-07",
+                  "temperatureC": 14,
+                  "summary": "Bracing"
+                },
+                {
+                  "date": "2022-01-08",
+                  "temperatureC": -13,
+                  "summary": "Freezing"
+                },
+                {
+                  "date": "2022-01-09",
+                  "temperatureC": -16,
+                  "summary": "Balmy"
+                },
+                {
+                  "date": "2022-01-10",
+                  "temperatureC": -2,
+                  "summary": "Chilly"
+                }
+                ]
+                """);
+
             return response;
         }
     }
