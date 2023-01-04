@@ -2,7 +2,7 @@
 
 namespace SharedLibrary;
 
-public class Client : BaseEntity, ITableEntity
+public class Customer : BaseEntity, ITableEntity
 {
     public string? Name { get; set; } = string.Empty;
     public string? LastName { get; set; } = string.Empty;

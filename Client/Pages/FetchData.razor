@@ -4,7 +4,9 @@
 <PageTitle>Weather forecast</PageTitle>
 
 <h1>Weather forecast</h1>
-
+<div class="col">
+    userId: @clientprincipal.UserId
+</div>
 <p>This component demonstrates fetching data from the server.</p>
 
 @if (forecasts == null)
@@ -38,9 +40,11 @@ else
 
 @code {
     private WeatherForecast[]? forecasts;
+    private SharedLibrary.SystemData.ClientPrincipal? clientprincipal = new();
 
     protected override async Task OnInitializedAsync()
     {
+        clientprincipal = await Http.GetFromJsonAsync<SharedLibrary.SystemData.ClientPrincipal>("/api/clientprincipal");
         forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("api/weather");
     }
 
