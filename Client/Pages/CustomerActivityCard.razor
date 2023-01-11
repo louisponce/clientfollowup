@@ -1,0 +1,34 @@
+﻿<RecordCard Caption="@Caption" OnCancel="OnCancel">
+    <div class="modal-body">
+        @if (Rec != null)
+        {
+            <RecordCardField TItem="string" Caption="Id" @bind-Value="@Rec.Id" @bind-Value:event="ValueChanged" Disabled="true" />
+            <RecordCardField TItem="string" Caption="Description" @bind-Value="@Rec.Description" @bind-Value:event="ValueChanged" />
+            @*
+        TODO: If the field has a dropdown, have Parameter in the component to accept the list
+        *@
+        }
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary" @onclick="Save">Save</button>
+        <button type="button" class="btn btn-danger" @onclick="Delete">Delete</button>
+    </div>
+</RecordCard>
+@code {
+    [Parameter] public string Caption { get; set; } = string.Empty;
+    [Parameter] public SharedLibrary.CustomerActivity Rec { get; set; } = new();
+    [Parameter] public EventCallback<bool> OnCancel { get; set; }
+    [Parameter] public EventCallback<SharedLibrary.CustomerActivity> OnSave { get; set; }
+    [Parameter] public EventCallback<SharedLibrary.CustomerActivity> OnDelete { get; set; }
+
+    private Task Save()
+    {
+        return OnSave.InvokeAsync(Rec);
+
+    }
+
+    private Task Delete()
+    {
+        return OnDelete.InvokeAsync(Rec);
+    }
+}

@@ -11,5 +11,4 @@ public class Customer
     public string? CountryCode { get; set; } = string.Empty;
     public DateTime DateCreated { get; set; }
     public bool Active { get; set; }
-    public int Votes { get; set; }
 }

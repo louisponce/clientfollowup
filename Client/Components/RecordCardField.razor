@@ -1,18 +1,18 @@
 ﻿@typeparam TItem
 <div class="row">
     <div class="col">
-        <label for="@Name">@Caption</label>
+        <label>@Caption</label>
     </div>
     <div class="col">
-        <input class="form-control" id="@Name" value="@Value" @oninput="@OnInputChange" />
+        <input class="form-control" value="@Value" @oninput="@OnInputChange" disabled="@Disabled" />
     </div>
 </div>
 
 @code {
-    [Parameter] public string? Name { get; set; }
     [Parameter] public string? Caption { get; set; }
     [Parameter] public TItem? Value { get; set; }
     [Parameter] public string? FormatType { get; set; }
+    [Parameter] public bool Disabled { get; set; } = false;
     [Parameter] public EventCallback<TItem> ValueChanged { get; set; }
 
     private async Task OnInputChange(ChangeEventArgs args)
@@ -23,10 +23,10 @@
         }
         catch (Exception ex)
         {
-            
+
             //throw;
         }
-        
+
         await ValueChanged.InvokeAsync(Value);
     }
 }

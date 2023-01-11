@@ -38,9 +38,14 @@ public class CustomerService
     {
         var dbcustomer = Helpers.Clone<TEntity, Customer>(customer);
         dbcustomer.RowKey = dbcustomer.Id;
+        if (dbcustomer.DateCreated == DateTime.MinValue)
+            dbcustomer.DateCreated = DateTime.UtcNow;
+        else
+            dbcustomer.DateCreated = DateTime.SpecifyKind(dbcustomer.DateCreated, DateTimeKind.Utc);
 
         if (string.IsNullOrEmpty(dbcustomer.RowKey))
         {
+            dbcustomer.DateCreated = DateTime.UtcNow;
             dbcustomer = await customerTableOperation.InsertAsync(dbcustomer);
             dbcustomer.Id = dbcustomer.RowKey;
         } else

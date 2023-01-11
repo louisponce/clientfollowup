@@ -1,0 +1,24 @@
+﻿<div class="modal fade show rounded" id="myModal" style="display:block; background-color: rgba(10,10,10,.6);" aria-modal="true" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">@Caption</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="Cancel"></button>
+            </div>
+            @ChildContent
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Caption { get; set; } = string.Empty;
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public EventCallback<bool> OnCancel { get; set; }
+    [Parameter] public EventCallback<bool> OnSave { get; set; }
+    [Parameter] public EventCallback<bool> OnDelete { get; set; }
+
+    private Task Cancel()
+    {
+        return OnCancel.InvokeAsync(false);
+    }
+}

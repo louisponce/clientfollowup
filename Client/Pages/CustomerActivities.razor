@@ -1,17 +1,17 @@
-﻿@page "/customers"
+﻿@page "/customeractivities"
 @inject HttpClient Http
 
-<PageTitle>Customers</PageTitle>
+<PageTitle>Customer Activities</PageTitle>
 
 <div class="container border p-1 rounded">
     <div class="row">
         <div class="col">
-            <h2>Customers</h2>
+            <h2>Customer Activities</h2>
         </div>
-        <div class="col text-end">
+@*        <div class="col text-end">
             <label for="search">Filter</label>
             <input id="serach" @oninput="OnFilterCriteriaChange" />
-        </div>
+        </div>*@
     </div>
     <div class="row">
         <div class="col">
@@ -37,26 +37,20 @@
 }
 else
 {
-    <RecordList Items="@list" Context="customer" TItem="@SharedLibrary.Customer" OnAfterItemClicked="OnAfterItemClicked">
+    <RecordList Items="@list" Context="customeractivity" TItem="@SharedLibrary.CustomerActivity" OnAfterItemClicked="OnAfterItemClicked">
         <TableHeader>
-            <th>Name</th>
-            <th>Last Name</th>
-            <th>Address</th>
-            <th>City</th>
-            <th>CountryCode</th>
+            <th>Id</th>
+            <th>Description</th>
         </TableHeader>
         <TableRow>
-            <td>@customer.Name</td>
-            <td>@customer.LastName</td>
-            <td>@customer.Address</td>
-            <td>@customer.City</td>
-            <td>@customer.CountryCode</td>
+            <td>@customeractivity.Id</td>
+            <td>@customeractivity.Description</td>
         </TableRow>
     </RecordList>
 
     @if (pageStatus.CardOpen)
     {
-        <CustomerCard Caption="Customer"
+        <CustomerActivityCard Caption="Customer Activity"
             Rec="@currRec"
             OnCancel="@OnCancel"
             OnSave="@OnSave"
@@ -68,19 +62,19 @@ else
 @code {
     private string debugLabel = string.Empty;
     private PageStatus pageStatus = new();
-    private List<SharedLibrary.Customer>? list;
-    private List<SharedLibrary.Customer>? rawList;
-    private SharedLibrary.Customer? currRec;
+    private List<SharedLibrary.CustomerActivity>? list;
+    private List<SharedLibrary.CustomerActivity>? rawList;
+    private SharedLibrary.CustomerActivity? currRec;
 
     protected override async Task OnInitializedAsync()
     {
-        var listResponseTask = Http.GetAsync("/api/customer");
+        var listResponseTask = Http.GetAsync("/api/customeractivity");
         await Task.WhenAll(listResponseTask);
 
         var response = listResponseTask.Result;
         var body = response.Content.ReadAsStringAsync().Result;
-        rawList = System.Text.Json.JsonSerializer.Deserialize<List<SharedLibrary.Customer>>(body);
-        list = System.Text.Json.JsonSerializer.Deserialize<List<SharedLibrary.Customer>>(body);
+        rawList = System.Text.Json.JsonSerializer.Deserialize<List<SharedLibrary.CustomerActivity>>(body);
+        list = System.Text.Json.JsonSerializer.Deserialize<List<SharedLibrary.CustomerActivity>>(body);
 
         if (list is not null)
         {
@@ -89,26 +83,7 @@ else
         }
     }
 
-    // TODO:
-    // Can this be broken out to a separate class?
-    // Perhaps loop through string properties and do the Where clause
-    private void OnFilterCriteriaChange(ChangeEventArgs e)
-    {
-        pageStatus.FilterCritera = e?.Value?.ToString();
-        try
-        {
-            list = rawList.Where(x =>
-                (x.Name.Contains(pageStatus.FilterCritera, StringComparison.OrdinalIgnoreCase)) ||
-                (x.LastName.Contains(pageStatus.FilterCritera, StringComparison.OrdinalIgnoreCase)) ||
-                (x.Address.Contains(pageStatus.FilterCritera, StringComparison.OrdinalIgnoreCase)) ||
-                (x.City.Contains(pageStatus.FilterCritera, StringComparison.OrdinalIgnoreCase))).ToList();
-        }
-        catch (Exception ex)
-        {
-        }
-    }
-
-    private void OnAfterItemClicked(SharedLibrary.Customer rec)
+    private void OnAfterItemClicked(SharedLibrary.CustomerActivity rec)
     {
         currRec = rec;
         pageStatus.CurrRecIndex = list.FindIndex(a => a.Id == currRec.Id);
@@ -126,14 +101,14 @@ else
         pageStatus.CardOpen = false;
     }
 
-    private async Task OnSave(SharedLibrary.Customer rec)
+    private async Task OnSave(SharedLibrary.CustomerActivity rec)
     {
         currRec = rec;
         await Save();
         pageStatus.CardOpen = false;
     }
 
-    private async Task OnDelete(SharedLibrary.Customer rec)
+    private async Task OnDelete(SharedLibrary.CustomerActivity rec)
     {
         currRec = rec;
         await Delete();
@@ -150,8 +125,8 @@ else
     private async Task Save()
     {
         var newEntry = string.IsNullOrWhiteSpace(currRec.Id);
-        using var httpResponse = await Http.PostAsJsonAsync<SharedLibrary.Customer>("api/customer", currRec);
-        currRec = await httpResponse.Content.ReadFromJsonAsync<SharedLibrary.Customer>();
+        using var httpResponse = await Http.PostAsJsonAsync<SharedLibrary.CustomerActivity>("api/customeractivity", currRec);
+        currRec = await httpResponse.Content.ReadFromJsonAsync<SharedLibrary.CustomerActivity>();
         if (newEntry)
         {
             rawList.Add(currRec);
@@ -164,7 +139,7 @@ else
 
     private async Task Delete()
     {
-        await Http.DeleteAsync($"api/customer/{currRec.Id}");
+        await Http.DeleteAsync($"api/customeractivity/{currRec.Id}");
         list.RemoveAt(pageStatus.CurrRecIndex);
         // Remove from raw list too
         pageStatus.CurrRecIndex--;

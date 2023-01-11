@@ -11,4 +11,6 @@ public class Customer : BaseEntity, ITableEntity
     public string? City { get; set; } = string.Empty;
     public string? PostCode { get; set; } = string.Empty;
     public string? CountryCode { get; set; } = string.Empty;
+    public DateTime DateCreated { get; set; }
+    public bool Active { get; set; }
 }
