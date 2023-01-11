@@ -1,7 +1,7 @@
 ﻿using Azure;
 using Azure.Data.Tables;
 
-namespace SharedLibrary;
+namespace DataServices.Models;
 
 public class BaseEntity : ITableEntity
 {

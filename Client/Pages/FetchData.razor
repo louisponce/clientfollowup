@@ -45,7 +45,23 @@ else
     protected override async Task OnInitializedAsync()
     {
         clientprincipal = await Http.GetFromJsonAsync<SharedLibrary.SystemData.ClientPrincipal>("/api/clientprincipal");
-        forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("api/weather");
+        //forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("api/weather");
+
+        SharedLibrary.Customer customer = new()
+            {
+                Name = "Louis",
+                LastName = "Ponce",
+                Address = "Gatan 1"
+            };
+        using var httpResponse = await Http.PostAsJsonAsync<SharedLibrary.Customer>("api/customer", customer);
+        customer = await httpResponse.Content.ReadFromJsonAsync<SharedLibrary.Customer>();
+
+        await Http.DeleteAsync($"api/customer/{customer.Id}");
+
+        var response = await Http.GetAsync("/api/customer");
+
+
+        var body = response.Content.ReadAsStringAsync().Result;
     }
 
     public class WeatherForecast

@@ -1,0 +1,169 @@
+﻿@page "/customers"
+@inject HttpClient Http
+
+<PageTitle>People</PageTitle>
+
+<div class="container border p-1 rounded">
+    <div class="row">
+        <div class="col">
+            <h2>People</h2>
+        </div>
+        <div class="col text-end">
+            <label for="search">Filter</label>
+            <input id="serach" @oninput="OnFilterCriteriaChange" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            @debugLabel
+        </div>
+        <div>
+
+        </div>
+    </div>
+</div>
+
+<div class="container border p-1 rounded">
+    <div class="row">
+        <div class="col">
+            <button type="button" class="btn btn-info" @onclick="New">New</button>
+        </div>
+    </div>
+</div>
+<br/>
+@if (list == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <RecordList Items="@list" Context="customer" TItem="@SharedLibrary.Customer" OnAfterItemClicked="OnAfterItemClicked">
+        <TableHeader>
+            <th>Name</th>
+            <th>Last Name</th>
+            <th>City</th>
+            <th>Created</th>
+        </TableHeader>
+        <TableRow>
+            <td>@customer.Name</td>
+            <td>@customer.LastName</td>
+            <td>@customer.City</td>
+            <td>@customer.DateCreated</td>
+        </TableRow>
+    </RecordList>
+
+    @if (pageStatus.CardOpen)
+    {
+        <CustomerCard Caption="Customer"
+            Rec="@currRec"
+            OnCancel="@OnCancel"
+            OnSave="@OnSave"
+          OnDelete="@OnDelete" />
+    }
+}
+
+
+@code {
+    private string debugLabel = string.Empty;
+    private SharedLibrary.PageStatus pageStatus = new();
+    private List<SharedLibrary.Customer>? list;
+    private List<SharedLibrary.Customer>? rawList;
+    private SharedLibrary.Customer? currRec;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var listResponseTask = Http.GetAsync("/api/customer");
+        await Task.WhenAll(listResponseTask);
+
+        var response = listResponseTask.Result;
+        var body = response.Content.ReadAsStringAsync().Result;
+        rawList = System.Text.Json.JsonSerializer.Deserialize<List<SharedLibrary.Customer>>(body);
+        list = System.Text.Json.JsonSerializer.Deserialize<List<SharedLibrary.Customer>>(body);
+
+        if (list is not null)
+        {
+            currRec = list[0];
+        }
+    }
+
+    // TODO:
+    // Can this be broken out to a separate class?
+    // Perhaps loop through string properties and do the Where clause
+    private void OnFilterCriteriaChange(ChangeEventArgs e)
+    {
+        pageStatus.FilterCritera = e?.Value?.ToString();
+        try
+        {
+            list = rawList.Where(x =>
+                (x.Name.Contains(pageStatus.FilterCritera, StringComparison.OrdinalIgnoreCase)) ||
+                (x.LastName.Contains(pageStatus.FilterCritera, StringComparison.OrdinalIgnoreCase)) ||
+                (x.Address.Contains(pageStatus.FilterCritera, StringComparison.OrdinalIgnoreCase)) ||
+                (x.City.Contains(pageStatus.FilterCritera, StringComparison.OrdinalIgnoreCase))).ToList();
+        }
+        catch (Exception ex)
+        {
+        }
+    }
+
+    private void OnAfterItemClicked(SharedLibrary.Customer rec)
+    {
+        currRec = rec;
+        pageStatus.CurrRecIndex = list.FindIndex(a => a.Id == currRec.Id);
+        OpenCard();
+    }
+
+
+    private void OpenCard()
+    {
+        pageStatus.CardOpen = true;
+    }
+
+    private void OnCancel(bool action)
+    {
+        pageStatus.CardOpen = false;
+    }
+
+    private async Task OnSave(SharedLibrary.Customer rec)
+    {
+        currRec = rec;
+        await Save();
+        pageStatus.CardOpen = false;
+    }
+
+    private async Task OnDelete(SharedLibrary.Customer rec)
+    {
+        currRec = rec;
+        await Delete();
+        pageStatus.CardOpen = false;
+    }
+
+
+    private void New()
+    {
+        currRec = new();
+        OpenCard();
+    }
+
+    private async Task Save()
+    {
+        var newEntry = string.IsNullOrWhiteSpace(currRec.Id);
+        using var httpResponse = await Http.PostAsJsonAsync<SharedLibrary.Customer>("api/customer", currRec);
+        currRec = await httpResponse.Content.ReadFromJsonAsync<SharedLibrary.Customer>();
+        if (newEntry)
+        {
+            rawList.Add(currRec);
+            list.Add(currRec);
+        }
+        list[pageStatus.CurrRecIndex] = currRec;
+
+    }
+
+    private async Task Delete()
+    {
+        await Http.DeleteAsync($"api/customer/{currRec.Id}");
+        list.RemoveAt(pageStatus.CurrRecIndex);
+        // Remove from raw list too
+        pageStatus.CurrRecIndex--;
+        currRec = list[pageStatus.CurrRecIndex];
+    }
+}

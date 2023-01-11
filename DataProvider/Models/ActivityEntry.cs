@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Azure.Data.Tables;
 using System.Runtime.Serialization;
 
-namespace SharedLibrary;
+namespace DataServices.Models;
 
-public class ActivityEntry
+public class ActivityEntry : BaseEntity, ITableEntity
 {
     public string? Id { get; set; } = string.Empty;
     public string CustomerId { get; set; } = string.Empty;

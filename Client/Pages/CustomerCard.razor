@@ -1,0 +1,56 @@
+﻿@*
+    TODO: Break out the outer div to a new component RecordCardFrame
+*@
+<div class="modal fade show rounded" id="myModal" style="display:block; background-color: rgba(10,10,10,.6);" aria-modal="true" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">@Caption</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="Cancel"></button>
+            </div>
+
+            <div class="modal-body">
+                @if (Rec != null)
+                {
+                    <RecordCardField TItem="string" Name="Name" Caption="Name" @bind-Value="@Rec.Name" @bind-Value:event="ValueChanged" />
+                    <RecordCardField TItem="string" Name="Last Name" Caption="Last Name" @bind-Value="@Rec.LastName" @bind-Value:event="ValueChanged" />
+                    <RecordCardField TItem="string" Name="City" Caption="City" @bind-Value="@Rec.City" @bind-Value:event="ValueChanged" />
+                    <RecordCardField TItem="DateTime" Name="Created" Caption="Created" @bind-Value="@Rec.DateCreated" @bind-Value:event="ValueChanged" />
+                    <RecordCardField TItem="int" Name="Votes" Caption="Votes" @bind-Value="@Rec.Votes" @bind-Value:event="ValueChanged" />
+                    <RecordCardField TItem="bool" Name="Active" Caption="Active" @bind-Value="@Rec.Active" @bind-Value:event="ValueChanged" />
+                    @*
+                        TODO: If the field has a dropdown, have Parameter in the component to accept the list
+                    *@
+                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" @onclick="Save">Save</button>
+                <button type="button" class="btn btn-danger" @onclick="Delete">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+@code {
+    [Parameter] public string Caption { get; set; } = string.Empty;
+    [Parameter] public SharedLibrary.Customer Rec { get; set; } = new();
+    [Parameter] public EventCallback<bool> OnCancel { get; set; }
+    [Parameter] public EventCallback<SharedLibrary.Customer> OnSave { get; set; }
+    [Parameter] public EventCallback<SharedLibrary.Customer> OnDelete { get; set; }
+
+
+    private Task Cancel()
+    {
+        return OnCancel.InvokeAsync(false);
+    }
+
+    private Task Save()
+    {
+        return OnSave.InvokeAsync(Rec);
+
+    }
+
+    private Task Delete()
+    {
+        return OnDelete.InvokeAsync(Rec);
+    }
+}

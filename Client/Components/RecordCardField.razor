@@ -1,0 +1,32 @@
+﻿@typeparam TItem
+<div class="row">
+    <div class="col">
+        <label for="@Name">@Caption</label>
+    </div>
+    <div class="col">
+        <input class="form-control" id="@Name" value="@Value" @oninput="@OnInputChange" />
+    </div>
+</div>
+
+@code {
+    [Parameter] public string? Name { get; set; }
+    [Parameter] public string? Caption { get; set; }
+    [Parameter] public TItem? Value { get; set; }
+    [Parameter] public string? FormatType { get; set; }
+    [Parameter] public EventCallback<TItem> ValueChanged { get; set; }
+
+    private async Task OnInputChange(ChangeEventArgs args)
+    {
+        try
+        {
+            Value = (TItem)Convert.ChangeType(args.Value, typeof(TItem), System.Globalization.CultureInfo.InstalledUICulture.NumberFormat);
+        }
+        catch (Exception ex)
+        {
+            
+            //throw;
+        }
+        
+        await ValueChanged.InvokeAsync(Value);
+    }
+}

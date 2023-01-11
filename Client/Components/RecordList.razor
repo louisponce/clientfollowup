@@ -1,0 +1,29 @@
+﻿@typeparam TItem
+@if (Items is not null)
+{
+    <table class="table fixed_header table-striped table-hover">
+        <thead>
+            <tr>@TableHeader</tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Items)
+            {
+                <tr @onclick="@(e => ItemClicked(item))">
+                    @TableRow(item)
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    [Parameter] public IEnumerable<TItem>? Items { get; set; }
+    [Parameter] public RenderFragment? TableHeader { get; set; }
+    [Parameter] public RenderFragment<TItem>? TableRow { get; set; }
+    [Parameter] public EventCallback<TItem> OnAfterItemClicked { get; set; }
+
+    private Task ItemClicked(TItem item)
+    {
+        return OnAfterItemClicked.InvokeAsync(item);
+    }
+}

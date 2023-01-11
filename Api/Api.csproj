@@ -12,6 +12,7 @@
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="1.7.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DataProvider\DataServices.csproj" />
     <ProjectReference Include="..\SharedLibrary\SharedLibrary.csproj" />
   </ItemGroup>
   <ItemGroup>

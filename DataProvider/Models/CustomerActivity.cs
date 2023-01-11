@@ -1,6 +1,8 @@
-﻿namespace SharedLibrary;
+﻿using Azure.Data.Tables;
 
-public class CustomerActivity
+namespace DataServices.Models;
+
+public class CustomerActivity : BaseEntity, ITableEntity
 
 {
     public string? Id { get; set; } = string.Empty;
